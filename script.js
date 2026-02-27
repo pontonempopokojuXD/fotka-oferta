@@ -119,3 +119,29 @@ function initCarousel() {
 }
 
 initCarousel();
+
+function initScrollReveal() {
+  const revealTargets = document.querySelectorAll(
+    ".hero-grid > div, .hours-card, .section, .card, .price-item, .upload-form, .contact-cta, blockquote"
+  );
+  if (!revealTargets.length) return;
+
+  document.body.classList.add("reveal-ready");
+  revealTargets.forEach((node) => node.classList.add("reveal-item"));
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
+  );
+
+  revealTargets.forEach((node) => observer.observe(node));
+}
+
+initScrollReveal();
