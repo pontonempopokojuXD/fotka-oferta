@@ -20,6 +20,27 @@ if (yearNode) {
   yearNode.textContent = String(new Date().getFullYear());
 }
 
+function detectSlugFromPath() {
+  const clean = window.location.pathname.replace(/\/+$/, "");
+  if (clean.endsWith("/index.html") || clean === "" || clean === "/") return "home";
+  const parts = clean.split("/").filter(Boolean);
+  const pageIdx = parts.indexOf("pages");
+  if (pageIdx >= 0) {
+    return parts.slice(pageIdx + 1).join("/").replace(/\/index\.html$/, "");
+  }
+  const maybeHtml = parts[parts.length - 1];
+  if (maybeHtml.endsWith(".html")) return maybeHtml.replace(".html", "");
+  return "home";
+}
+
+function getScriptBasePath() {
+  const script = document.querySelector("script[src$='script.js']");
+  if (!script) return ".";
+  const src = script.getAttribute("src") || "script.js";
+  const base = src.replace(/\/?script\.js(?:\?.*)?$/, "");
+  return base || ".";
+}
+
 function initCarousel() {
   const carousel = document.querySelector("[data-carousel]");
   if (!carousel) return;
@@ -148,12 +169,12 @@ initScrollReveal();
 
 async function initContentCms() {
   const targets = document.querySelectorAll("[data-content-key]");
-  if (!targets.length) return;
+  let localData = {};
+  const basePath = getScriptBasePath();
 
-  let data = {};
   try {
-    const response = await fetch("content.json");
-    if (response.ok) data = await response.json();
+    const response = await fetch(`${basePath}/content.json`);
+    if (response.ok) localData = await response.json();
   } catch (_) {
     // keep defaults from HTML
   }
@@ -162,31 +183,71 @@ async function initContentCms() {
     const overrideRaw = localStorage.getItem("fotkaContentOverride");
     if (overrideRaw) {
       const override = JSON.parse(overrideRaw);
-      data = { ...data, ...override };
+      localData = { ...localData, ...override };
     }
   } catch (_) {
     // ignore malformed local override
   }
 
-  targets.forEach((node) => {
-    const key = node.getAttribute("data-content-key");
-    if (!key || !(key in data)) return;
-    const value = String(data[key] ?? "");
-    const attr = node.getAttribute("data-content-attr");
-    if (attr) node.setAttribute(attr, value);
-    else node.textContent = value;
-  });
+  function applyKeyData(data) {
+    if (!targets.length) return;
+    targets.forEach((node) => {
+      const key = node.getAttribute("data-content-key");
+      if (!key || !(key in data)) return;
+      const value = String(data[key] ?? "");
+      const attr = node.getAttribute("data-content-attr");
+      if (attr) node.setAttribute(attr, value);
+      else node.textContent = value;
+    });
 
-  // Keep phone/email links in sync
-  const phone = data.contactPhone;
-  if (phone) {
-    const href = "tel:" + phone.replace(/\s+/g, "");
-    document.querySelectorAll("[data-content-key='contactPhone']").forEach((el) => el.setAttribute("href", href));
+    const phone = data.contactPhone;
+    if (phone) {
+      const href = "tel:" + phone.replace(/\s+/g, "");
+      document.querySelectorAll("[data-content-key='contactPhone']").forEach((el) => el.setAttribute("href", href));
+    }
+    const email = data.contactEmail;
+    if (email) {
+      const href = "mailto:" + email;
+      document.querySelectorAll("[data-content-key='contactEmail']").forEach((el) => el.setAttribute("href", href));
+    }
   }
-  const email = data.contactEmail;
-  if (email) {
-    const href = "mailto:" + email;
-    document.querySelectorAll("[data-content-key='contactEmail']").forEach((el) => el.setAttribute("href", href));
+
+  applyKeyData(localData);
+
+  // Headless CMS override (Supabase)
+  try {
+    const configResp = await fetch(`${basePath}/cms-config.json`);
+    if (!configResp.ok) return;
+    const config = await configResp.json();
+    if (!config.enabled || !config.supabaseUrl || !config.supabaseAnonKey || !window.supabase) return;
+    const client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+    const slug = detectSlugFromPath();
+    const { data, error } = await client
+      .from("cms_pages")
+      .select("slug,title,hero_eyebrow,hero_title,hero_lead,seo_description,content_html,published")
+      .eq("slug", slug)
+      .eq("published", true)
+      .maybeSingle();
+
+    if (error || !data) return;
+
+    // Apply generic page content
+    const heroEyebrow = document.querySelector(".hero .eyebrow");
+    const heroTitle = document.querySelector(".hero h1");
+    const heroLead = document.querySelector(".hero .lead");
+    const content = document.querySelector(".page-content");
+
+    if (heroEyebrow && data.hero_eyebrow) heroEyebrow.textContent = data.hero_eyebrow;
+    if (heroTitle && data.hero_title) heroTitle.textContent = data.hero_title;
+    if (heroLead && data.hero_lead) heroLead.textContent = data.hero_lead;
+    if (content && data.content_html) content.innerHTML = data.content_html;
+    if (data.seo_description) {
+      const desc = document.querySelector("meta[name='description']");
+      if (desc) desc.setAttribute("content", data.seo_description);
+    }
+    if (data.title) document.title = `${data.title} | FOT-KA Warszawa`;
+  } catch (_) {
+    // silent fallback
   }
 }
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Panel admina | FOT-KA</title>
+  <title>CMS admin | FOT-KA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -12,50 +12,69 @@
     .wrap { max-width:960px; margin:0 auto; padding:20px; }
     .box { background:#fff; border:1px solid #dbe5f3; border-radius:14px; padding:16px; margin-bottom:14px; }
     label { display:block; font-weight:600; margin-bottom:6px; }
-    input, textarea { width:100%; border:1px solid #c8d5e8; border-radius:10px; padding:10px; font:inherit; }
+    input, textarea, select { width:100%; border:1px solid #c8d5e8; border-radius:10px; padding:10px; font:inherit; }
     textarea { min-height:80px; }
     .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .actions { display:flex; gap:8px; flex-wrap:wrap; }
     button, a.btn { border:1px solid #0a6bff; background:#0a6bff; color:#fff; padding:10px 14px; border-radius:10px; text-decoration:none; cursor:pointer; font-weight:600; }
     button.alt { background:#fff; color:#0a6bff; }
+    button.warn { border-color:#d94747; background:#d94747; }
     .small { font-size:13px; color:#4d627e; }
+    .hidden { display:none; }
+    .status { padding:10px; border-radius:10px; font-size:14px; margin-top:8px; }
+    .ok { background:#edf8ee; border:1px solid #c7e8ca; color:#205a24; }
+    .err { background:#fff1f1; border:1px solid #f1c5c5; color:#8b2727; }
+    .media-row { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:end; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; word-break:break-all; }
     @media (max-width:760px){ .row{grid-template-columns:1fr;} }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Panel admina - edycja treści</h1>
-    <p class="small">Edytuj treści i pobierz nowy plik <code>content.json</code>. Następnie podmień go w repozytorium przez GitHub.</p>
+    <h1>CMS admin - FOT-KA</h1>
+    <p class="small">Logowanie, edycja treści stron i dodawanie zdjęć (Supabase).</p>
 
-    <div class="box row">
-      <div><label for="heroTitle">Nagłówek hero</label><input id="heroTitle" /></div>
-      <div><label for="heroEyebrow">Nadtytuł hero</label><input id="heroEyebrow" /></div>
-      <div style="grid-column:1/-1;"><label for="heroLead">Opis hero</label><textarea id="heroLead"></textarea></div>
+    <div id="loginBox" class="box row">
+      <div><label for="email">E-mail admina</label><input id="email" type="email" placeholder="admin@firma.pl" /></div>
+      <div><label for="password">Hasło</label><input id="password" type="password" placeholder="••••••••" /></div>
+      <div class="actions" style="grid-column:1/-1;">
+        <button id="loginBtn">Zaloguj</button>
+      </div>
     </div>
 
-    <div class="box row">
-      <div><label for="hoursWeek">Godziny pn-pt</label><input id="hoursWeek" /></div>
-      <div><label for="hoursSat">Godziny sobota</label><input id="hoursSat" /></div>
-      <div><label for="hoursSun">Godziny niedziela</label><input id="hoursSun" /></div>
-      <div><label for="contactPhone">Telefon</label><input id="contactPhone" /></div>
-      <div style="grid-column:1/-1;"><label for="hoursNote">Notatka o godzinach</label><textarea id="hoursNote"></textarea></div>
+    <div id="cmsBox" class="hidden">
+      <div class="box row">
+        <div><label for="slug">Slug strony</label><input id="slug" placeholder="np. home lub oferta/zdjecia-do-dokumentow" /></div>
+        <div><label for="title">Tytuł (SEO)</label><input id="title" /></div>
+        <div><label for="heroEyebrow">Nadtytuł hero</label><input id="heroEyebrow" /></div>
+        <div><label for="heroTitle">Nagłówek hero</label><input id="heroTitle" /></div>
+        <div style="grid-column:1/-1;"><label for="heroLead">Opis hero</label><textarea id="heroLead"></textarea></div>
+        <div style="grid-column:1/-1;"><label for="seoDescription">Opis SEO</label><textarea id="seoDescription"></textarea></div>
+        <div style="grid-column:1/-1;"><label for="contentHtml">Treść strony (HTML)</label><textarea id="contentHtml" style="min-height:220px;"></textarea></div>
+      </div>
+
+      <div class="box">
+        <h3>Media</h3>
+        <div class="media-row">
+          <div><label for="imageFile">Dodaj zdjęcie</label><input id="imageFile" type="file" accept="image/*" /></div>
+          <button id="uploadBtn" type="button">Upload</button>
+        </div>
+        <p class="small">Po uploadzie otrzymasz URL. Możesz wkleić go do treści HTML.</p>
+        <div id="uploadResult" class="mono"></div>
+      </div>
+
+      <div class="box actions">
+        <button id="loadBtn" class="alt">Wczytaj stronę</button>
+        <button id="saveBtn">Zapisz do CMS</button>
+        <button id="deleteBtn" class="warn">Usuń wpis</button>
+        <button id="logoutBtn" class="alt">Wyloguj</button>
+        <a class="btn alt" href="../index.html">Wróć na stronę</a>
+      </div>
     </div>
 
-    <div class="box row">
-      <div style="grid-column:1/-1;"><label for="mapIntro">Opis mapy</label><textarea id="mapIntro"></textarea></div>
-      <div style="grid-column:1/-1;"><label for="mapEmbedUrl">URL mapy (iframe src)</label><input id="mapEmbedUrl" /></div>
-      <div style="grid-column:1/-1;"><label for="contactAddress">Adres</label><input id="contactAddress" /></div>
-      <div><label for="contactEmail">E-mail</label><input id="contactEmail" /></div>
-      <div><label for="contactLead">Opis kontaktu</label><textarea id="contactLead"></textarea></div>
-    </div>
-
-    <div class="box actions">
-      <button id="previewBtn" class="alt">Podgląd lokalny (LocalStorage)</button>
-      <button id="downloadBtn">Pobierz content.json</button>
-      <button id="resetBtn" class="alt">Wyczyść podgląd</button>
-      <a class="btn alt" href="../index.html">Wróć na stronę</a>
-    </div>
+    <div id="status" class="status hidden"></div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="admin.js"></script>
 </body>
 </html>

@@ -1,0 +1,6 @@
+{
+  "enabled": false,
+  "supabaseUrl": "",
+  "supabaseAnonKey": "",
+  "storageBucket": "media"
+}
