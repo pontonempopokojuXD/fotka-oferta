@@ -253,7 +253,7 @@ p {
   inset: 0;
   background:
     linear-gradient(112deg, rgba(5, 13, 24, 0.86) 0%, rgba(7, 17, 30, 0.52) 46%, rgba(9, 22, 38, 0.72) 100%),
-    url("site-mirror/assets/wp-content/uploads/2019/03/slider3.jpg") center/cover no-repeat;
+    url("assets/images/slider3.jpg") center/cover no-repeat;
   transform: scale(1.03);
 }
 
@@ -878,6 +878,20 @@ blockquote p {
   grid-template-columns: 1.2fr auto;
   align-items: center;
   gap: 1.4rem;
+}
+
+.map-wrap {
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+.map-wrap iframe {
+  width: 100%;
+  min-height: 360px;
+  border: 0;
 }
 
 .reveal-ready .reveal-item {
