@@ -60,9 +60,9 @@
     <section class="hero">
       <div class="container hero-grid">
         <div>
-          <p class="eyebrow">Zakład fotograficzny w Warszawie</p>
-          <h1>Profesjonalna fotografia z tradycją od 1949 roku</h1>
-          <p class="lead">
+          <p class="eyebrow" data-content-key="heroEyebrow">Zakład fotograficzny w Warszawie</p>
+          <h1 data-content-key="heroTitle">Profesjonalna fotografia z tradycją od 1949 roku</h1>
+          <p class="lead" data-content-key="heroLead">
             Zdjęcia do dokumentów, odbitki, reprodukcje fotografii, zdjęcia na płótnie,
             digitalizacja negatywów i slajdów oraz fotokalendarze.
           </p>
@@ -85,11 +85,11 @@
         <aside class="hours-card" aria-label="Godziny otwarcia">
           <h2>Godziny otwarcia</h2>
           <ul>
-            <li><span>Poniedziałek - Piątek</span> <strong>10:00 - 18:00</strong></li>
-            <li><span>Sobota</span> <strong>10:00 - 14:00</strong></li>
-            <li><span>Niedziela</span> <strong>Nieczynne</strong></li>
+            <li><span>Poniedziałek - Piątek</span> <strong data-content-key="hoursWeek">10:00 - 18:00</strong></li>
+            <li><span>Sobota</span> <strong data-content-key="hoursSat">10:00 - 14:00</strong></li>
+            <li><span>Niedziela</span> <strong data-content-key="hoursSun">Nieczynne</strong></li>
           </ul>
-          <p class="muted">W razie zmian godzin aktualizujemy informacje telefonicznie i na stronie.</p>
+          <p class="muted" data-content-key="hoursNote">W razie zmian godzin aktualizujemy informacje telefonicznie i na stronie.</p>
         </aside>
       </div>
     </section>
@@ -224,11 +224,13 @@
     <section class="section" id="mapa">
       <div class="container">
         <h2>Gdzie jesteśmy</h2>
-        <p class="section-intro">Zapraszamy do naszego zakładu fotograficznego w Warszawie.</p>
+        <p class="section-intro" data-content-key="mapIntro">Zapraszamy do naszego zakładu fotograficznego w Warszawie.</p>
         <div class="map-wrap">
           <iframe
             title="Mapa dojazdu do FOT-KA"
-            src="https://www.openstreetmap.org/export/embed.html?bbox=20.978%2C52.204%2C21.025%2C52.236&layer=mapnik"
+            data-content-key="mapEmbedUrl"
+            data-content-attr="src"
+            src="https://www.google.com/maps?q=ul.+Tarczy%C5%84ska+3A,+02-025+Warszawa&output=embed"
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade">
           </iframe>
@@ -240,10 +242,10 @@
       <div class="container contact-grid">
         <div>
           <h2>Kontakt</h2>
-          <p>Masz nietypowe zamówienie? Zadzwoń lub napisz - doradzimy najlepsze rozwiązanie.</p>
-          <p><strong>Telefon:</strong> <a href="tel:+48228227316">+48 22 822 73 16</a></p>
-          <p><strong>E-mail:</strong> <a href="mailto:lab@fotoFOTKA.pl">lab@fotoFOTKA.pl</a></p>
-          <p><strong>Miasto:</strong> Warszawa</p>
+          <p data-content-key="contactLead">Masz nietypowe zamówienie? Zadzwoń lub napisz - doradzimy najlepsze rozwiązanie.</p>
+          <p><strong>Telefon:</strong> <a href="tel:+48228227316" data-content-key="contactPhone">+48 22 822 73 16</a></p>
+          <p><strong>E-mail:</strong> <a href="mailto:lab@fotoFOTKA.pl" data-content-key="contactEmail">lab@fotoFOTKA.pl</a></p>
+          <p><strong>Adres:</strong> <span data-content-key="contactAddress">ul. Tarczyńska 3A, 02-025 Warszawa (Ochota, Centrum)</span></p>
         </div>
         <div class="contact-cta">
           <h3>Szybki kontakt</h3>
@@ -258,6 +260,7 @@
     <div class="container footer-row">
       <p>&copy; <span id="year"></span> FOT-KA. Wszelkie prawa zastrzeżone.</p>
       <a href="#top">Do góry</a>
+      <a href="admin/index.html">Panel admina</a>
     </div>
   </footer>
 

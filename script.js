@@ -145,3 +145,49 @@ function initScrollReveal() {
 }
 
 initScrollReveal();
+
+async function initContentCms() {
+  const targets = document.querySelectorAll("[data-content-key]");
+  if (!targets.length) return;
+
+  let data = {};
+  try {
+    const response = await fetch("content.json");
+    if (response.ok) data = await response.json();
+  } catch (_) {
+    // keep defaults from HTML
+  }
+
+  try {
+    const overrideRaw = localStorage.getItem("fotkaContentOverride");
+    if (overrideRaw) {
+      const override = JSON.parse(overrideRaw);
+      data = { ...data, ...override };
+    }
+  } catch (_) {
+    // ignore malformed local override
+  }
+
+  targets.forEach((node) => {
+    const key = node.getAttribute("data-content-key");
+    if (!key || !(key in data)) return;
+    const value = String(data[key] ?? "");
+    const attr = node.getAttribute("data-content-attr");
+    if (attr) node.setAttribute(attr, value);
+    else node.textContent = value;
+  });
+
+  // Keep phone/email links in sync
+  const phone = data.contactPhone;
+  if (phone) {
+    const href = "tel:" + phone.replace(/\s+/g, "");
+    document.querySelectorAll("[data-content-key='contactPhone']").forEach((el) => el.setAttribute("href", href));
+  }
+  const email = data.contactEmail;
+  if (email) {
+    const href = "mailto:" + email;
+    document.querySelectorAll("[data-content-key='contactEmail']").forEach((el) => el.setAttribute("href", href));
+  }
+}
+
+initContentCms();
